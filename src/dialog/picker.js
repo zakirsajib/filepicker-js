@@ -46,9 +46,9 @@ filepicker.extend('picker', function(){
         fp.util.setDefault(options, 'container', fp.browser.isMobile ? 'window' : 'modal');
     };
 
-    var getPickHandler = function(onSuccess, onError, onProgress) {
+    var getPickHandler = function(onSuccess, onError, onProgress, target) {
         var handler = function(data) {
-            if (filterDataType(data, onProgress)) {
+            if (filterDataType(data, onProgress, target)) {
                 return;
             }
 
@@ -132,9 +132,9 @@ filepicker.extend('picker', function(){
         return fpfile;
     };
 
-    var getPickMultipleHandler = function(onSuccess, onError, onProgress) {
+    var getPickMultipleHandler = function(onSuccess, onError, onProgress, target) {
         var handler = function(data) {
-            if (filterDataType(data, onProgress)) {
+            if (filterDataType(data, onProgress, target)) {
                 return;
             }
             fp.uploading = false;
@@ -228,22 +228,29 @@ filepicker.extend('picker', function(){
         };
 
         var url;
-        var handler;
+            
         if (convertFile) {
             url = fp.urls.constructConvertUrl(options, id);
-            handler = getPickHandler(onSuccessMark, onErrorMark, onProgress);
         } else if (multiple) {
             url = fp.urls.constructPickUrl(options, id, true);
-            handler = getPickMultipleHandler(onSuccessMark, onErrorMark, onProgress);
         } else if (folder) {
             url = fp.urls.constructPickFolderUrl(options, id);
-            handler = getPickFolderHandler(onSuccessMark, onErrorMark, onProgress);
         } else {
             url = fp.urls.constructPickUrl(options, id, false);
-            handler = getPickHandler(onSuccessMark, onErrorMark, onProgress);
         }
 
-        fp.window.open(options.container, url, onClose);
+        var target = fp.window.open(options.container, url, onClose),
+            handler;
+
+        if (multiple) {
+            handler = getPickMultipleHandler(onSuccessMark, onErrorMark, onProgress, target);
+        } else if (folder) {
+            handler = getPickFolderHandler(onSuccessMark, onErrorMark, onProgress, target);
+        } else {
+            handler = getPickHandler(onSuccessMark, onErrorMark, onProgress, target);
+        }
+
+        
         fp.handlers.attach(id, handler);
 
         var key = id+'-upload';
@@ -252,20 +259,28 @@ filepicker.extend('picker', function(){
         }));
     };
 
-    function filterDataType(data, onProgress){ 
-        if (data.type === 'filepickerProgress'){
-            fp.uploading = true;
-            if (onProgress) {
-                onProgress(data.payload.data);
-            }
-        } else if (data.type === 'notUploading') {
-            fp.uploading = false;
-        } else if (data.type === 'closeModal') {
-            fp.modal.close();
-        } else if (data.type === 'hideModal') {
-            fp.modal.hide();
-        } else if (data.type === 'filepickerUrl') {
-            return false;
+    function filterDataType(data, onProgress, target){ 
+        switch(data.type) {
+            case 'filepickerProgress':
+                fp.uploading = true;
+                if (onProgress) {
+                    onProgress(data.payload.data);
+                }
+                break;
+            case 'notUploading':
+                fp.uploading = false;
+                break;
+            case 'closeModal':
+                fp.modal.close();
+                break;
+            case 'hideModal':
+                fp.modal.hide();
+                break;
+            case 'filepickerSelected':
+                fp.comm.sendData(target, 'filepickerSelected', data.payload.data);
+                break;
+            case 'filepickerUrl':
+                return false;
         }
         return true;
     }

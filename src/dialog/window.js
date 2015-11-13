@@ -15,7 +15,8 @@ filepicker.extend('window', function(){
 
     var openWindow = function(container, src, onClose) {
         onClose = onClose || function(){};
-        var isMobile = (fp.browser.isIOS() || fp.browser.isAndroid());
+        var isMobile = (fp.browser.isIOS() || fp.browser.isAndroid()),
+            modal;
         if (!container && isMobile){
             container = 'window';
         } else if (!container) {
@@ -40,14 +41,17 @@ filepicker.extend('window', function(){
                     onClose();
                 }
             }, CLOSE_CHECK_INTERVAL);
+            return win;
         } else if (container === 'modal') {
-            fp.modal.generate(src, onClose);
+            modal = fp.modal.generate(src, onClose);
+            return modal.contentWindow;
         } else {
             var container_iframe = document.getElementById(container);
             if (!container_iframe) {
                 throw new fp.FilepickerException('Container "'+container+'" not found. This should either be set to "window","modal", or the ID of an iframe that is currently in the document.');
             }
             container_iframe.src = src;
+            return container_iframe.contentWindow;
         }
     };
 

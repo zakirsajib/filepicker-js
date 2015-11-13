@@ -2,15 +2,22 @@
 'use strict';
 
 filepicker.extend('comm', function(){
-    var fp = this;
+    var fp = this,
+        COMM_IFRAME_NAME = 'filepicker_comm_iframe',
+        API_IFRAME_NAME = 'fpapi_comm_iframe',
+        use_local = canUseLocalstorage(),
+        isOpen = false;
 
-    var COMM_IFRAME_NAME = 'filepicker_comm_iframe';
-    var API_IFRAME_NAME = 'fpapi_comm_iframe';
+    return {
+        openChannel: openCommIframe,
+        closeChannel: destroyCommIframe,
+        sendData: sendData
+    };
 
     /*
      * Opens the IFrame if there isn't one
      */
-    var openCommIframe = function(){
+    function openCommIframe(){
         if (window.frames[COMM_IFRAME_NAME] === undefined) {
             //Attach a event handler
             openCommunicationsChannel();
@@ -35,24 +42,23 @@ filepicker.extend('comm', function(){
             apiIFrame.style.display = 'none';
             document.body.appendChild(apiIFrame);
         }
-    };
+    }
 
-    var communicationsHandler = function(event){
+    function communicationsHandler(event){
         if (event.origin !== fp.urls.BASE && event.origin !== fp.urls.DIALOG_BASE) {
             return;
         }
         var data = fp.json.parse(event.data);
         fp.handlers.run(data);
-    };
+    }
 
     /*
      * 1. Creates the general communcation handler
      * 2. Set to listen
      * ONLY RUN ONCE
      */
-    var isOpen = false;
 
-    var openCommunicationsChannel = function(){
+    function openCommunicationsChannel(){
         if (isOpen){
             return;
         } else {
@@ -70,9 +76,9 @@ filepicker.extend('comm', function(){
         } else {
             throw new fp.FilepickerException('Unsupported browser');
         }
-    };
+    }
 
-    var destroyCommIframe = function(){
+    function destroyCommIframe(){
         //Modern
         if (window.removeEventListener) {
             window.removeEventListener('message', communicationsHandler, false);
@@ -100,10 +106,43 @@ filepicker.extend('comm', function(){
             api_iframes[j].parentNode.removeChild(api_iframes[j]);
         }
         try{delete window.frames[API_IFRAME_NAME];}catch(e){}
-    };
+    }
 
-    return {
-        openChannel: openCommIframe,
-        closeChannel: destroyCommIframe
-    };
+
+    function sendData(target, type, data) {
+        var out = {'type': type, 'payload' : {'data':data}};
+        sendMessage(target, JSON.stringify(out), '*');
+    }
+
+
+    function sendMessage(target, message, domain) {
+        domain = domain || '*';
+        if (!target || typeof target.postMessage !== 'function') {
+            if (use_local) {
+                sendLocalMessage(message);
+            }
+            return;
+        }
+        target.postMessage(message, domain);
+    }
+
+    function canUseLocalstorage(){
+        try {
+            if ('localStorage' in window && window.localStorage !== null) {
+                return !!window.localStorage.getItem('fp-message-ready');
+            }
+        } catch(e){
+            console.error('Local storage error: ', e.message);
+            return false;
+        }
+    }
+
+    function sendLocalMessage(message) {
+        var queue = window.localStorage.getItem('fp-message-queue') || '[]';
+        queue = JSON.parse(queue);
+        queue.push(message);
+        window.localStorage.setItem('fp-message-queue', JSON.stringify(queue));
+    }
+
+
 });
