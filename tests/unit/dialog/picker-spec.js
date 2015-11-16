@@ -17,7 +17,7 @@ describe("The picker module", function(){
         var success = jasmine.createSpy("success");
         var error = jasmine.createSpy("error");
 
-        filepicker.picker.createPicker(options, success, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: false});
         //not called on this run
         expect(filepicker.window.open).not.toHaveBeenCalled();
 
@@ -46,7 +46,8 @@ describe("The picker module", function(){
 
         var cookies = filepicker.cookies.THIRD_PARTY_COOKIES;
         filepicker.cookies.THIRD_PARTY_COOKIES = true;
-        filepicker.picker.createPicker(options, onSuccess, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: onSuccess, onError: error, multiple: false});
+
         filepicker.cookies.THIRD_PARTY_COOKIES = cookies;
 
         expect(filepicker.urls.constructPickUrl).toHaveBeenCalledWith(
@@ -98,7 +99,7 @@ describe("The picker module", function(){
 
         var cookies = filepicker.cookies.THIRD_PARTY_COOKIES;
         filepicker.cookies.THIRD_PARTY_COOKIES = true;
-        filepicker.picker.createPicker(options, success, error, true);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: true});
         filepicker.cookies.THIRD_PARTY_COOKIES = cookies;
 
         expect(filepicker.urls.constructPickUrl).toHaveBeenCalledWith(
@@ -147,7 +148,7 @@ describe("The picker module", function(){
 
         spyOn(filepicker.window, "open");
 
-        filepicker.picker.createPicker(options, success, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: false});
 
         function onSuccess(resp){
             expect(resp.url).toMatch("https://www.filepicker.io/api/file/");
@@ -172,7 +173,7 @@ describe("The picker module", function(){
 
         var cookies = filepicker.cookies.THIRD_PARTY_COOKIES;
         filepicker.cookies.THIRD_PARTY_COOKIES = true;
-        filepicker.picker.createPicker(options, success, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: false});
         filepicker.cookies.THIRD_PARTY_COOKIES = cookies;
 
         //options is modified directly
@@ -205,7 +206,7 @@ describe("The picker module", function(){
 
         var cookies = filepicker.cookies.THIRD_PARTY_COOKIES;
         filepicker.cookies.THIRD_PARTY_COOKIES = true;
-        filepicker.picker.createPicker(options, success, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: false});
         filepicker.cookies.THIRD_PARTY_COOKIES = cookies;
 
         expect(filepicker.urls.constructPickUrl).toHaveBeenCalledWith(
@@ -232,7 +233,7 @@ describe("The picker module", function(){
 
         var cookies = filepicker.cookies.THIRD_PARTY_COOKIES;
         filepicker.cookies.THIRD_PARTY_COOKIES = true;
-        filepicker.picker.createPicker(options, success, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: false});
         filepicker.cookies.THIRD_PARTY_COOKIES = cookies;
 
         expect(filepicker.urls.constructPickUrl).toHaveBeenCalledWith(
@@ -288,7 +289,7 @@ describe("The picker module", function(){
 
         var cookies = filepicker.cookies.THIRD_PARTY_COOKIES;
         filepicker.cookies.THIRD_PARTY_COOKIES = true;
-        filepicker.picker.createPicker(options, success, error, false);
+        filepicker.picker.createPicker({options: options, onSuccess: success, onError: error, multiple: false});
         filepicker.cookies.THIRD_PARTY_COOKIES = cookies;
 
         expect(filepicker.urls.constructPickUrl).toHaveBeenCalledWith(
