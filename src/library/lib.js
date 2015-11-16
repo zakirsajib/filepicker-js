@@ -42,7 +42,7 @@ filepicker.extend(function(){
      *   102: Unknown error in picking file
      * onProgress: @Function(@Object). Function called when there is progress event
      */
-    var pick = function(options, onSuccess, onError, onProgress) {
+    var pick = function(options, onSuccess, onError, onProgress, onSelect) {
         fp.util.checkApiKey();
 
         if (typeof options === 'function') {
@@ -56,7 +56,15 @@ filepicker.extend(function(){
         onSuccess = onSuccess || function(){};
         onError = onError || fp.errors.handleError;
 
-        fp.picker.createPicker(options, onSuccess, onError, false, false, onProgress);
+        fp.picker.createPicker({
+            options: options,
+            onSuccess: onSuccess,
+            onError: onError,
+            onProgress: onProgress,
+            onSelect: onSelect,
+            multiple: false,
+            folder: false
+        });
     };
     
     /**
@@ -85,7 +93,7 @@ filepicker.extend(function(){
      *   102: Unknown error in picking file
      * onProgress: @Function(@Object). Function called when there is progress event
      */
-    var pickMultiple = function(options, onSuccess, onError, onProgress) {
+    var pickMultiple = function(options, onSuccess, onError, onProgress, onSelect) {
         fp.util.checkApiKey();
 
         if (typeof options === 'function') {
@@ -100,7 +108,15 @@ filepicker.extend(function(){
         onSuccess = onSuccess || function(){};
         onError = onError || fp.errors.handleError;
 
-        fp.picker.createPicker(options, onSuccess, onError, true, false, onProgress);
+        fp.picker.createPicker({
+            options: options,
+            onSuccess: onSuccess,
+            onError: onError,
+            onProgress: onProgress,
+            onSelect: onSelect,
+            multiple: true,
+            folder: false
+        });
     };
 
     /**
@@ -133,7 +149,7 @@ filepicker.extend(function(){
      *   151: The content store cannot be reached
      * onProgress: @Function(@Object). Function called when there is progress event
      */
-    var pickAndStore = function(picker_options, store_options, onSuccess, onError, onProgress) {
+    var pickAndStore = function(picker_options, store_options, onSuccess, onError, onProgress, onSelect) {
         fp.util.checkApiKey();
         if (!picker_options || !store_options || 
                 typeof picker_options === 'function' || typeof picker_options === 'function') {
@@ -164,7 +180,15 @@ filepicker.extend(function(){
             success = function(resp){onSuccess([resp]);};
         }
 
-        fp.picker.createPicker(options, success, onError, multiple, false, onProgress);
+        fp.picker.createPicker({
+            options: options, 
+            onSuccess: success, 
+            onError: onError, 
+            onProgress: onProgress,
+            onSelect: onSelect, 
+            multiple: multiple,
+            folder: false
+        });
     };
 
     /**
@@ -180,7 +204,7 @@ filepicker.extend(function(){
      *   101: The user closed the picker without choosing a folder
      *   102: Unknown error in picking folder
      */
-    var pickFolder = function(options, onSuccess, onError, onProgress) {
+    var pickFolder = function(options, onSuccess, onError, onProgress, onSelect) {
         fp.util.checkApiKey();
 
         if (typeof options === 'function') {
@@ -194,7 +218,15 @@ filepicker.extend(function(){
         onSuccess = onSuccess || function(){};
         onError = onError || fp.errors.handleError;
 
-        fp.picker.createPicker(options, onSuccess, onError, false, true, onProgress);
+        fp.picker.createPicker({
+            options: options, 
+            onSuccess: onSuccess, 
+            onError: onError, 
+            onProgress: onProgress,
+            onSelect: onSelect, 
+            multiple: false,
+            folder: true
+        });
     };
 
     /**
@@ -468,7 +500,15 @@ filepicker.extend(function(){
         options.backgroundUpload = true;
         options.hide = false;
 
-        fp.picker.createPicker(options, onSuccess, onError, false, false, onProgress, true);
+        fp.picker.createPicker({
+            options: options, 
+            onSuccess: onSuccess, 
+            onError: onError, 
+            onProgress: onProgress, 
+            multiple: false,
+            folder: false,
+            convertFile: true
+        });
     };
 
     /**

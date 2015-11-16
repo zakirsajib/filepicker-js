@@ -115,6 +115,7 @@ filepicker.extend('urls', function(){
             (options.imageQuality ? '&iq='+options.imageQuality : '')+
             (fp.util.isCanvasSupported() ? '' : '&canvas=false')+
             (options.redirectUrl ? '&redirect_url='+options.redirectUrl : '')+
+            (options.onSelectCallback ? '&scl=true' : '')+
             /*
                 prevent from showing close button twice
             */
